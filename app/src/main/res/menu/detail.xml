@@ -9,4 +9,10 @@
         android:title="@string/action_share"
         android:icon="@drawable/ic_share_white_48dp"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="99"
+        app:showAsAction="never" />
 </menu>

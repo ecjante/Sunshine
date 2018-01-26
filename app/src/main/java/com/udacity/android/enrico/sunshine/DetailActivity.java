@@ -48,4 +48,16 @@ public class DetailActivity extends AppCompatActivity {
                 .setText(mWeatherDetails)
                 .getIntent();
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemSelected = item.getItemId();
+        switch (itemSelected) {
+            case R.id.action_settings:
+                SettingsActivity.launch(this);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }

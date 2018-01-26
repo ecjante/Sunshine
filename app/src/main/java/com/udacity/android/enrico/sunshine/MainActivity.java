@@ -62,11 +62,6 @@ public class MainActivity extends AppCompatActivity implements
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
-    public void loadWeatherData() {
-        showWeatherData();
-
-    }
-
     public void openLocationInMap() {
         String addressString = "1600 Ampitheatre Parkway, CA";
         Uri geoLocation = Uri.parse("geo:0,0?q=" + addressString);
@@ -80,6 +75,10 @@ public class MainActivity extends AppCompatActivity implements
             Timber.d("Couldn't call " + geoLocation.toString()
                     + ", no receiving apps installed!");
         }
+    }
+
+    public void openSettings() {
+
     }
 
     private void showWeatherData() {
@@ -166,15 +165,19 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemSelected = item.getItemId();
-        if (itemSelected == R.id.action_refresh) {
-            mAdapter.setWeatherData(null);
-            getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
-            return true;
+        switch (itemSelected) {
+            case R.id.action_refresh:
+                mAdapter.setWeatherData(null);
+                getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
+                return true;
+            case R.id.action_map:
+                openLocationInMap();
+                return true;
+            case R.id.action_settings:
+                SettingsActivity.launch(this);
+                return true;
         }
-        if (itemSelected == R.id.action_map) {
-            openLocationInMap();
-            return true;
-        }
+
         return super.onOptionsItemSelected(item);
     }
 }
