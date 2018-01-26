@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.udacity.android.enrico.sunshine.data.SunshinePreferences;
 import com.udacity.android.enrico.sunshine.utilities.NetworkUtils;
@@ -17,13 +18,15 @@ import com.udacity.android.enrico.sunshine.utilities.OpenWeatherJsonUtils;
 
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ForecastAdapter.ForecastAdapterOnClickHandler {
 
     private TextView mErrorMessageTextView;
     private ProgressBar mLoadingIndicator;
     private RecyclerView mRecyclerView;
 
     private ForecastAdapter mAdapter;
+
+    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
         mRecyclerView = findViewById(R.id.rv_forecast);
 
-        mAdapter = new ForecastAdapter();
+        mAdapter = new ForecastAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
         LinearLayoutManager linearLayout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(linearLayout);
@@ -57,6 +60,15 @@ public class MainActivity extends AppCompatActivity {
     private void showErrorMessage() {
         mRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessageTextView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onListItemClicked(String data) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(this, data, Toast.LENGTH_LONG);
+        mToast.show();
     }
 
     private class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
