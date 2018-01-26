@@ -25,6 +25,8 @@
     <string name="app_name">Sunshine</string>
 
     <string name="action_refresh">Refresh</string>
+    <string name="action_share">Share</string>
+    <string name="share_chooser_title">Share Weather Details.</string>
 
     <string name="error_message">
         An error has occurred. Please try again by clicking REFRESH
