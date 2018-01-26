@@ -26,8 +26,10 @@ public class DetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null) {
             if (intent.hasExtra(Intent.EXTRA_TEXT)) {
-                mWeatherDetails = intent.getStringExtra(Intent.EXTRA_TEXT);
-                mDisplayWeatherTextview.setText(mWeatherDetails);
+                String weatherDetails = intent.getStringExtra(Intent.EXTRA_TEXT);
+                mDisplayWeatherTextview.setText(weatherDetails);
+
+                mWeatherDetails = weatherDetails + " " + FORECAST_SHARE_HASHTAG;
             }
         }
     }
