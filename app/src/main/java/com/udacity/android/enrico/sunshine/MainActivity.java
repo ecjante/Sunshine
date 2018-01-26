@@ -21,8 +21,6 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements ForecastAdapter.ForecastAdapterOnClickHandler {
 
-    public static final String WEATHER_DATA_EXTRA = "weatherData";
-
     private TextView mErrorMessageTextView;
     private ProgressBar mLoadingIndicator;
     private RecyclerView mRecyclerView;
@@ -66,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapter.F
     @Override
     public void onListItemClicked(String data) {
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra(WEATHER_DATA_EXTRA, data);
+        intent.putExtra(Intent.EXTRA_TEXT, data);
         startActivity(intent);
     }
 
