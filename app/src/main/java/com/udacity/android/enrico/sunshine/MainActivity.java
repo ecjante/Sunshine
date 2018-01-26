@@ -3,6 +3,8 @@ package com.udacity.android.enrico.sunshine;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.udacity.android.enrico.sunshine.data.SunshinePreferences;
@@ -62,5 +64,21 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.forecast, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemSelected = item.getItemId();
+        if (itemSelected == R.id.action_refresh) {
+            mWeatherTextView.setText("");
+            loadWeatherData();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
