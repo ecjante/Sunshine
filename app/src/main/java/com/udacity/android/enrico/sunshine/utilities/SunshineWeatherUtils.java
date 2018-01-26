@@ -21,14 +21,14 @@ import android.util.Log;
 import com.udacity.android.enrico.sunshine.R;
 import com.udacity.android.enrico.sunshine.data.SunshinePreferences;
 
+import timber.log.Timber;
+
 /**
  * Contains useful utilities for a weather app, such as conversion between Celsius and Fahrenheit,
  * from kph to mph, and from degrees to NSEW.  It also contains the mapping of weather condition
  * codes in OpenWeatherMap to strings.  These strings are contained
  */
 public final class SunshineWeatherUtils {
-
-    private static final String LOG_TAG = SunshineWeatherUtils.class.getSimpleName();
 
     /**
      * This method will convert a temperature from Celsius to Fahrenheit.
@@ -392,7 +392,7 @@ public final class SunshineWeatherUtils {
         } else if (weatherId >= 951 && weatherId <= 957) {
             return R.drawable.art_clear;
         }
-        Log.e(LOG_TAG, "Unknown Weather: " + weatherId);
+        Timber.e("Unknown Weather: " + weatherId);
         return R.drawable.art_storm;
     }
 }

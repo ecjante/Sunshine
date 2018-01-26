@@ -25,12 +25,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
+import timber.log.Timber;
+
 /**
  * These utilities will be used to communicate with the weather servers.
  */
 public final class NetworkUtils {
-
-    private static final String TAG = NetworkUtils.class.getSimpleName();
 
     private static final String DYNAMIC_WEATHER_URL =
             "https://andfun-weather.udacity.com/weather";
@@ -83,7 +83,7 @@ public final class NetworkUtils {
             e.printStackTrace();
         }
 
-        Log.v(TAG, "Built URI " + url);
+        Timber.v("Built URI " + url);
 
         return url;
     }

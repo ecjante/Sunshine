@@ -1,8 +1,12 @@
 package com.udacity.android.enrico.sunshine;
 
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,15 +15,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.udacity.android.enrico.sunshine.data.SunshinePreferences;
 import com.udacity.android.enrico.sunshine.utilities.NetworkUtils;
 import com.udacity.android.enrico.sunshine.utilities.OpenWeatherJsonUtils;
+import com.udacity.android.enrico.sunshine.utilities.ReleaseTree;
 
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements ForecastAdapter.ForecastAdapterOnClickHandler {
+import timber.log.Timber;
+
+public class MainActivity extends AppCompatActivity implements
+        ForecastAdapter.ForecastAdapterOnClickHandler,
+        LoaderManager.LoaderCallbacks<String[]> {
+
+    private static final int LOADER_ID = 22;
 
     private TextView mErrorMessageTextView;
     private ProgressBar mLoadingIndicator;
@@ -30,6 +40,13 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapter.F
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        } else {
+            Timber.plant(new ReleaseTree());
+        }
+
         setContentView(R.layout.activity_forecast);
 
         mErrorMessageTextView = findViewById(R.id.tv_error_message);
@@ -42,13 +59,27 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapter.F
         mRecyclerView.setLayoutManager(linearLayout);
         mRecyclerView.setHasFixedSize(true);
 
-        loadWeatherData();
+        getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
     public void loadWeatherData() {
         showWeatherData();
-        String location = SunshinePreferences.getPreferredWeatherLocation(this);
-        new FetchWeatherTask().execute(location);
+
+    }
+
+    public void openLocationInMap() {
+        String addressString = "1600 Ampitheatre Parkway, CA";
+        Uri geoLocation = Uri.parse("geo:0,0?q=" + addressString);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(geoLocation);
+
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Timber.d("Couldn't call " + geoLocation.toString()
+                    + ", no receiving apps installed!");
+        }
     }
 
     private void showWeatherData() {
@@ -68,43 +99,62 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapter.F
         startActivity(intent);
     }
 
-    private class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
+    @Override
+    public Loader<String[]> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<String[]>(this) {
+            String[] mWeatherData = null;
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-        }
+            @Override
+            protected void onStartLoading() {
+                super.onStartLoading();
 
-        @Override
-        protected String[] doInBackground(String... strings) {
-            if (strings.length == 0)
-                return null;
-
-            String location = strings[0];
-            URL locationUrl = NetworkUtils.buildUrl(location);
-
-            try {
-                String jsonResponse = NetworkUtils.getResponseFromHttpUrl(locationUrl);
-                String[] weatherResponse = OpenWeatherJsonUtils.getSimpleWeatherStringsFromJson(MainActivity.this, jsonResponse);
-
-                return weatherResponse;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
+                if (mWeatherData != null) {
+                    deliverResult(mWeatherData);
+                } else {
+                    mLoadingIndicator.setVisibility(View.VISIBLE);
+                    forceLoad();
+                }
             }
-        }
 
-        @Override
-        protected void onPostExecute(String[] strings) {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            if (strings != null) {
-                showWeatherData();
-                mAdapter.setWeatherData(strings);
-            } else {
-                showErrorMessage();
+            @Nullable
+            @Override
+            public String[] loadInBackground() {
+                String location = SunshinePreferences.getPreferredWeatherLocation(MainActivity.this);
+                URL locationUrl = NetworkUtils.buildUrl(location);
+
+                try {
+                    String jsonResponse = NetworkUtils.getResponseFromHttpUrl(locationUrl);
+                    String[] weatherResponse = OpenWeatherJsonUtils.getSimpleWeatherStringsFromJson(MainActivity.this, jsonResponse);
+
+                    return weatherResponse;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
             }
+
+            @Override
+            public void deliverResult(@Nullable String[] data) {
+                mWeatherData = data;
+                super.deliverResult(data);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<String[]> loader, String[] data) {
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mAdapter.setWeatherData(data);
+        if (data == null) {
+            showErrorMessage();
+        } else {
+            showWeatherData();
         }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<String[]> loader) {
+
     }
 
     @Override
@@ -118,7 +168,12 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapter.F
         int itemSelected = item.getItemId();
         if (itemSelected == R.id.action_refresh) {
             mAdapter.setWeatherData(null);
-            loadWeatherData();
+            getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
+            return true;
+        }
+        if (itemSelected == R.id.action_map) {
+            openLocationInMap();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

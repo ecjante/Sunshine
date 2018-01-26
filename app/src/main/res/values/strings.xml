@@ -25,6 +25,7 @@
     <string name="app_name">Sunshine</string>
 
     <string name="action_refresh">Refresh</string>
+    <string name="action_map">Map Location</string>
     <string name="action_share">Share</string>
     <string name="share_chooser_title">Share Weather Details.</string>
 

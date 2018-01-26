@@ -10,4 +10,8 @@
         android:icon="@drawable/ic_refresh_white_48dp"
         android:orderInCategory="0"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_map"
+        android:title="@string/action_map"
+        app:showAsAction="never" />
 </menu>
