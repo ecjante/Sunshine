@@ -1,5 +1,6 @@
 package com.udacity.android.enrico.sunshine;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -20,13 +21,13 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements ForecastAdapter.ForecastAdapterOnClickHandler {
 
+    public static final String WEATHER_DATA_EXTRA = "weatherData";
+
     private TextView mErrorMessageTextView;
     private ProgressBar mLoadingIndicator;
     private RecyclerView mRecyclerView;
 
     private ForecastAdapter mAdapter;
-
-    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +65,9 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapter.F
 
     @Override
     public void onListItemClicked(String data) {
-        if (mToast != null) {
-            mToast.cancel();
-        }
-        mToast = Toast.makeText(this, data, Toast.LENGTH_LONG);
-        mToast.show();
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra(WEATHER_DATA_EXTRA, data);
+        startActivity(intent);
     }
 
     private class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
