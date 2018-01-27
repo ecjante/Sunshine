@@ -1,8 +1,10 @@
 package com.udacity.android.enrico.sunshine;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -27,6 +29,7 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements
         ForecastAdapter.ForecastAdapterOnClickHandler,
+        SharedPreferences.OnSharedPreferenceChangeListener,
         LoaderManager.LoaderCallbacks<String[]> {
 
     private static final int LOADER_ID = 22;
@@ -36,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements
     private RecyclerView mRecyclerView;
 
     private ForecastAdapter mAdapter;
+
+    private static boolean PREFERENCES_UPDATED = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,10 +65,27 @@ public class MainActivity extends AppCompatActivity implements
         mRecyclerView.setHasFixedSize(true);
 
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (PREFERENCES_UPDATED) {
+            Timber.d("onStart: preferences were updated");
+            getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
+            PREFERENCES_UPDATED = false;
+        }
     }
 
     public void openLocationInMap() {
-        String addressString = "1600 Ampitheatre Parkway, CA";
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        String addressString = pref.getString(
+                getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default)
+        );
         Uri geoLocation = Uri.parse("geo:0,0?q=" + addressString);
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -75,10 +97,6 @@ public class MainActivity extends AppCompatActivity implements
             Timber.d("Couldn't call " + geoLocation.toString()
                     + ", no receiving apps installed!");
         }
-    }
-
-    public void openSettings() {
-
     }
 
     private void showWeatherData() {
@@ -179,5 +197,17 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        PREFERENCES_UPDATED = true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
     }
 }
