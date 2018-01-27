@@ -97,43 +97,76 @@ public class WeatherProvider extends ContentProvider {
 
     @Override
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
-        if (sUriMatcher.match(uri) == CODE_WEATHER) {
-            SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-            db.beginTransaction();
-            int insertCount = 0;
-            try {
-                for (ContentValues value : values) {
-                    // Check to make sure date is sent in the correct format
-                    long weatherDate = value.getAsLong(WeatherEntry.COLUMN_DATE);
-                    if (!SunshineDateUtils.isDateNormalized(weatherDate))
-                        throw new IllegalArgumentException("Date must be normalized to insert");
+        switch (sUriMatcher.match(uri)) {
+            case CODE_WEATHER:
+                SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+                db.beginTransaction();
+                int insertCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        // Check to make sure date is sent in the correct format
+                        long weatherDate = value.getAsLong(WeatherEntry.COLUMN_DATE);
+                        if (!SunshineDateUtils.isDateNormalized(weatherDate))
+                            throw new IllegalArgumentException("Date must be normalized to insert");
 
-                    long _id = db.insert(WeatherEntry.TABLE_NAME, null, value);
-                    if (_id != -1)
-                        insertCount++;
+                        long _id = db.insert(WeatherEntry.TABLE_NAME, null, value);
+                        if (_id != -1)
+                            insertCount++;
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
                 }
-                db.setTransactionSuccessful();
-            } finally {
-                db.endTransaction();
-            }
 
-            if (insertCount > 0) {
-                getContext().getContentResolver().notifyChange(uri, null);
-            }
+                if (insertCount > 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
 
-            return insertCount;
-        } else {
-            return super.bulkInsert(uri, values);
+                return insertCount;
+            default:
+                return super.bulkInsert(uri, values);
         }
     }
 
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+
+        int numRowsDeleted;
+
+        /*
+         * If we pass null as the selection to SQLiteDatabase#delete, our entire table will be
+         * deleted. However, if we do pass null and delete all of the rows in the table, we won't
+         * know how many rows were deleted. According to the documentation for SQLiteDatabase,
+         * passing "1" for the selection will delete all rows and return the number of rows
+         * deleted, which is what the caller of this method expects.
+         */
+        if (null == selection) selection = "1";
+
+        switch (sUriMatcher.match(uri)) {
+            case CODE_WEATHER:
+                numRowsDeleted = db.delete(
+                        WeatherContract.WeatherEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs
+                );
+
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        if (numRowsDeleted > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return numRowsDeleted;
     }
 
     @Override
-    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
+    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues,
+                      @Nullable String selection, @Nullable String[] selectionArgs) {
         return 0;
     }
 
