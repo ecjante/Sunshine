@@ -1,6 +1,9 @@
 package com.udacity.android.enrico.sunshine.data;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
+
+import com.udacity.android.enrico.sunshine.utilities.SunshineDateUtils;
 
 /**
  * Created by enrico on 1/26/18.
@@ -8,7 +11,17 @@ import android.provider.BaseColumns;
 
 public class WeatherContract {
 
+    public static final String CONTENT_AUTHORITY = "com.udacity.android.enrico.sunshine";
+
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
+    public static final String PATH_WEATHER = "weather";
+
     public static final class WeatherEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_WEATHER)
+                .build();
 
         public static final String TABLE_NAME = "weather";
 
@@ -28,5 +41,30 @@ public class WeatherContract {
 
         public static final String COLUMN_DEGREES = "degrees";
 
+        /**
+         * Builds a URI that adds the weather date to the end of the forecast content URI path.
+         * This is used to query details about a single weather entry by date. This is what we
+         * use for the detail view query. We assume a normalized date is passed to this method.
+         *
+         * @param date Normalized date in milliseconds
+         * @return Uri to query details about a single weather entry
+         */
+        public static Uri buildWeatherUriWithDate(long date) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Long.toString(date))
+                    .build();
+        }
+
+        /**
+         * Returns just the selection part of the weather query from a normalized today value.
+         * This is used to get a weather forecast from today's date. To make this easy to use
+         * in compound selection, we embed today's date as an argument in the query.
+         *
+         * @return The selection part of the weather query for today onwards
+         */
+        public static String getSqlSelectForTodayOnwards() {
+            long normalizedUtcNow = SunshineDateUtils.normalizeDate(System.currentTimeMillis());
+            return WeatherContract.WeatherEntry.COLUMN_DATE + " >= " + normalizedUtcNow;
+        }
     }
 }

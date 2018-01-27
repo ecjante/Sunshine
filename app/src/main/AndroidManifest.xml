@@ -30,6 +30,11 @@
             android:label="@string/settings_title">
 
         </activity>
+
+        <provider
+            android:authorities="com.udacity.android.enrico.sunshine"
+            android:name=".data.WeatherProvider"
+            android:exported="false" />
     </application>
 
 </manifest>
