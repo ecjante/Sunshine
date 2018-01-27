@@ -1,5 +1,6 @@
 package com.udacity.android.enrico.sunshine.data;
 
+import android.annotation.TargetApi;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -92,7 +93,7 @@ public class WeatherProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
-        return null;
+        throw new RuntimeException("We are not implementing insert in Sunshine. Use bulkInsert instead");
     }
 
     @Override
@@ -167,12 +168,19 @@ public class WeatherProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues,
                       @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        throw new RuntimeException("We are not implementing update in Sunshine");
     }
 
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
-        return null;
+        throw new RuntimeException("We are not implementing getType in Sunshine.");
+    }
+
+    @Override
+    @TargetApi(11)
+    public void shutdown() {
+        mOpenHelper.close();
+        super.shutdown();
     }
 }

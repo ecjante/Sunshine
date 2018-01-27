@@ -22,7 +22,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
     private ForecastAdapterOnClickHandler mListener;
 
     public interface ForecastAdapterOnClickHandler {
-        void onListItemClicked(String data);
+        void onListItemClicked(long date);
     }
 
     public ForecastAdapter(Context context, ForecastAdapterOnClickHandler listener) {
@@ -81,8 +81,8 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
 
         @Override
         public void onClick(View view) {
-            String data = mWeatherTextView.getText().toString();
-            mListener.onListItemClicked(data);
+            mCursor.moveToPosition(getAdapterPosition());
+            mListener.onListItemClicked(mCursor.getLong(MainActivity.INDEX_WEATHER_DATE));
         }
     }
 }

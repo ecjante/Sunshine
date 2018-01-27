@@ -86,6 +86,14 @@ public final class SunshineWeatherUtils {
         return highLowStr;
     }
 
+    public static String getFormattedHumidity(Context context, float humidity) {
+        return context.getString(R.string.format_humidity, humidity);
+    }
+
+    public static String getFormattedPressure(Context context, float pressure) {
+        return context.getString(R.string.format_pressure, pressure);
+    }
+
     /**
      * This method uses the wind direction in degrees to determine compass direction as a
      * String. (eg NW) The method will return the wind String in the following form: "2 km/h SW"
