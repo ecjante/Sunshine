@@ -1,15 +1,18 @@
 package com.udacity.android.enrico.sunshine;
 
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -20,6 +23,7 @@ import android.widget.ProgressBar;
 import com.udacity.android.enrico.sunshine.data.WeatherContract;
 import com.udacity.android.enrico.sunshine.sync.SunshineSyncUtils;
 import com.udacity.android.enrico.sunshine.utilities.FakeDataUtils;
+import com.udacity.android.enrico.sunshine.utilities.NotificationUtils;
 import com.udacity.android.enrico.sunshine.utilities.ReleaseTree;
 
 import timber.log.Timber;

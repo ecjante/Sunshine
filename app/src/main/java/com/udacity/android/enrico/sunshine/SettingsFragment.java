@@ -1,17 +1,20 @@
 package com.udacity.android.enrico.sunshine;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.PreferenceScreen;
 
 import com.udacity.android.enrico.sunshine.data.SunshinePreferences;
 import com.udacity.android.enrico.sunshine.data.WeatherContract;
 import com.udacity.android.enrico.sunshine.sync.SunshineSyncUtils;
+import com.udacity.android.enrico.sunshine.utilities.NotificationUtils;
 
 /**
  * Created by enrico on 1/26/18.
@@ -33,6 +36,27 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                 String value = pref.getString(p.getKey(), "");
                 setPreferenceSummary(p, value);
             }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        boolean isEnabled = NotificationUtils.isNotificationEnabled(getContext());
+
+        getPreferenceManager()
+                .findPreference(getString(R.string.pref_enable_notifications_key))
+                .setEnabled(isEnabled);
+
+        if (!isEnabled) {
+            pref.edit()
+                    .putBoolean(getString(R.string.pref_enable_notifications_key), false)
+                    .apply();
+
+            CheckBoxPreference checkBoxPreference = (CheckBoxPreference) findPreference(getString(R.string.pref_enable_notifications_key));
+            checkBoxPreference.setChecked(false);
         }
     }
 
@@ -80,4 +104,5 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             p.setSummary(stringValue);
         }
     }
+
 }

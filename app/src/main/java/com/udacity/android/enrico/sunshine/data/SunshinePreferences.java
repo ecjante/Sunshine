@@ -15,11 +15,13 @@
  */
 package com.udacity.android.enrico.sunshine.data;
 
+import android.app.Notification;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.udacity.android.enrico.sunshine.R;
+import com.udacity.android.enrico.sunshine.utilities.NotificationUtils;
 
 public class SunshinePreferences {
 
@@ -205,5 +207,13 @@ public class SunshinePreferences {
         String lastNotificationKey = context.getString(R.string.pref_last_notification);
         editor.putLong(lastNotificationKey, timeOfNotification);
         editor.apply();
+    }
+
+    public static boolean areNotificationsEnabled(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getBoolean(
+                context.getString(R.string.pref_enable_notifications_key),
+                context.getResources().getBoolean(R.bool.show_notifications)
+        ) && NotificationUtils.isNotificationEnabled(context);
     }
 }
