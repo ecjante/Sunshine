@@ -10,6 +10,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name">
@@ -19,6 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".DetailActivity"
             android:parentActivityName=".MainActivity"
@@ -27,14 +29,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings">
 
-        </activity>
+        <activity android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" />
 
         <provider
             android:authorities="@string/content_authority"
             android:name=".data.WeatherProvider"
+            android:exported="false" />
+
+        <service android:name=".sync.SunshineSyncIntentService"
             android:exported="false" />
     </application>
 

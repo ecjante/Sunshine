@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.udacity.android.enrico.sunshine.data.WeatherContract;
+import com.udacity.android.enrico.sunshine.sync.SunshineSyncUtils;
 import com.udacity.android.enrico.sunshine.utilities.FakeDataUtils;
 import com.udacity.android.enrico.sunshine.utilities.ReleaseTree;
 
@@ -61,8 +62,6 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_forecast);
         getSupportActionBar().setElevation(0f);
 
-        FakeDataUtils.insertFakeData(this);
-
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
         mRecyclerView = findViewById(R.id.rv_forecast);
 
@@ -75,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements
         showLoading();
 
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+
+        SunshineSyncUtils.startImmediateSync(this);
     }
 
     public void openLocationInMap() {
