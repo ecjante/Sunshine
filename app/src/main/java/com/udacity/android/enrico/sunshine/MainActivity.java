@@ -1,9 +1,11 @@
 package com.udacity.android.enrico.sunshine;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -13,6 +15,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -131,11 +134,20 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onListItemClicked(long date) {
+    public void onListItemClicked(View view, long date) {
         Uri uri = WeatherContract.WeatherEntry.buildWeatherUriWithDate(date);
         Intent intent = new Intent(this, DetailActivity.class);
         intent.setData(uri);
-        startActivity(intent);
+        if (Build.VERSION.SDK_INT >= 21) {
+            Bundle b = ActivityOptions.makeSceneTransitionAnimation(
+                    this,
+                    Pair.create(view, view.getTransitionName())
+            ).toBundle();
+
+            startActivity(intent, b);
+        } else {
+            startActivity(intent);
+        }
     }
 
     @Override

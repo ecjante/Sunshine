@@ -44,7 +44,8 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/art_clear"
             android:contentDescription="@{weatherData.descriptionA11y}"
-            android:setWeatherIcon="@{weatherData.largeIcon}" />
+            android:setWeatherIcon="@{weatherData.largeIcon}"
+            android:transitionName="@string/weather_icon" />
 
         <TextView
             android:id="@+id/weather_description"

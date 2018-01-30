@@ -37,7 +37,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline"
             tools:src="@drawable/art_clear"
-            android:setWeatherIcon="@{weatherData.icon}"/>
+            android:setWeatherIcon="@{weatherData.icon}"
+            android:transitionName="@string/weather_icon" />
 
         <TextView
             android:id="@+id/date"

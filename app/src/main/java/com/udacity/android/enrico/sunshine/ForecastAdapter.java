@@ -31,7 +31,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
     private ForecastAdapterOnClickHandler mListener;
 
     public interface ForecastAdapterOnClickHandler {
-        void onListItemClicked(long date);
+        void onListItemClicked(View view, long date);
     }
 
     public ForecastAdapter(Context context, ForecastAdapterOnClickHandler listener) {
@@ -113,7 +113,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
         @Override
         public void onClick(View view) {
             WeatherData data = mData.get(getAdapterPosition());
-            mListener.onListItemClicked(data.getDateMillis());
+            mListener.onListItemClicked(view.findViewById(R.id.weather_icon), data.getDateMillis());
         }
     }
 }

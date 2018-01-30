@@ -54,7 +54,8 @@
                 app:layout_constraintRight_toLeftOf="@+id/horizontal_middle"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:src="@drawable/art_clear"
-                android:setWeatherIcon="@{weatherData.largeIcon}" />
+                android:setWeatherIcon="@{weatherData.largeIcon}"
+                android:transitionName="@string/weather_icon" />
 
             <TextView
                 android:id="@+id/weather_description"

@@ -37,6 +37,8 @@
 
     <string name="content_authority">com.udacity.android.enrico.sunshine</string>
 
+    <string name="weather_icon" translatable="false">weather_icon</string>
+
     <!-- - - - - - - - - - - -->
     <!-- Used by Preferences -->
     <!-- - - - - - - - - - - -->
