@@ -40,13 +40,13 @@ public class SunshineSyncUtils {
                 .setTag(SUNSHINE_SYNC_TAG)
                 .setRecurring(true)
                 .setLifetime(Lifetime.FOREVER)
-//                .setTrigger(Trigger.executionWindow(
-//                        SYNC_INTERVAL_SECONDS, SYNC_INTERVAL_SECONDS + SYNC_FLEXTIME_SECONDS
-//                ))
-//                For testing purposes
                 .setTrigger(Trigger.executionWindow(
-                        10, 15
+                        SYNC_INTERVAL_SECONDS, SYNC_INTERVAL_SECONDS + SYNC_FLEXTIME_SECONDS
                 ))
+//                For testing purposes
+//                .setTrigger(Trigger.executionWindow(
+//                        10, 15
+//                ))
                 .setReplaceCurrent(true)
                 .setConstraints(Constraint.ON_ANY_NETWORK)
                 .build();

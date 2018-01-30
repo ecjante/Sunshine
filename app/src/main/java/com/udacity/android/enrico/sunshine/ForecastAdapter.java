@@ -1,15 +1,17 @@
 package com.udacity.android.enrico.sunshine;
 
 import android.content.Context;
-import android.database.Cursor;
+import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.udacity.android.enrico.sunshine.utilities.SunshineDateUtils;
-import com.udacity.android.enrico.sunshine.utilities.SunshineWeatherUtils;
+import com.udacity.android.enrico.sunshine.data.WeatherData;
+import com.udacity.android.enrico.sunshine.databinding.ForecastListItemBinding;
+
+import java.util.List;
 
 /**
  * Created by enrico on 1/26/18.
@@ -18,7 +20,7 @@ import com.udacity.android.enrico.sunshine.utilities.SunshineWeatherUtils;
 public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapterViewHolder> {
 
     private Context mContext;
-    private Cursor mCursor;
+    private List<WeatherData> mData;
     private ForecastAdapterOnClickHandler mListener;
 
     public interface ForecastAdapterOnClickHandler {
@@ -34,55 +36,48 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
     public ForecastAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
-        View view = inflater.inflate(R.layout.forecast_list_item, parent, false);
-        return new ForecastAdapterViewHolder(view);
+        ViewDataBinding binding = DataBindingUtil.inflate(inflater, R.layout.forecast_list_item, parent, false);
+
+        return new ForecastAdapterViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(ForecastAdapterViewHolder holder, int position) {
-        mCursor.moveToPosition(position);
+        WeatherData data = mData.get(position);
 
-        long date = mCursor.getLong(MainActivity.INDEX_WEATHER_DATE);
-        String dateStr = SunshineDateUtils.getFriendlyDateString(mContext, date, false);
-
-        int weatherId = mCursor.getInt(MainActivity.INDEX_WEATHER_CONDITION_ID);
-        String condition = SunshineWeatherUtils.getStringForWeatherCondition(mContext, weatherId);
-
-        double minTemp = mCursor.getDouble(MainActivity.INDEX_WEATHER_MIN_TEMP);
-        double maxTemp = mCursor.getDouble(MainActivity.INDEX_WEATHER_MAX_TEMP);
-        String temp = SunshineWeatherUtils.formatHighLows(mContext, maxTemp, minTemp);
-
-        String weatherData = dateStr + " - " + condition + " - " + temp;
-
-        holder.mWeatherTextView.setText(weatherData);
+        if (holder.mBinding instanceof ForecastListItemBinding) {
+            ForecastListItemBinding binding = (ForecastListItemBinding) holder.mBinding;
+            binding.setWeatherData(data);
+        }
+        holder.mBinding.executePendingBindings();
     }
 
     @Override
     public int getItemCount() {
-        if (mCursor == null)
+        if (mData == null)
             return 0;
-        return mCursor.getCount();
+        return mData.size();
     }
 
-    public void swapCursor(Cursor cursor) {
-        this.mCursor = cursor;
+    public void swapData(List<WeatherData> data) {
+        this.mData = data;
         notifyDataSetChanged();
     }
 
     public class ForecastAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView mWeatherTextView;
+        ViewDataBinding mBinding;
 
-        public ForecastAdapterViewHolder(View itemView) {
-            super(itemView);
-            mWeatherTextView = itemView.findViewById(R.id.tv_weather_data);
+        public ForecastAdapterViewHolder(ViewDataBinding binding) {
+            super(binding.getRoot());
+            mBinding = binding;
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            mCursor.moveToPosition(getAdapterPosition());
-            mListener.onListItemClicked(mCursor.getLong(MainActivity.INDEX_WEATHER_DATE));
+            WeatherData data = mData.get(getAdapterPosition());
+            mListener.onListItemClicked(data.getDateMillis());
         }
     }
 }
