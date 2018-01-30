@@ -72,20 +72,8 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
 
     @Override
     public void onBindViewHolder(ForecastAdapterViewHolder holder, int position) {
-        WeatherData data = mData.get(position);
-
-        int viewType = getItemViewType(position);
-
-        if (viewType == FUTURE_DAY_VIEW_TYPE && holder.mBinding instanceof ForecastListItemBinding) {
-            ForecastListItemBinding binding = (ForecastListItemBinding) holder.mBinding;
-            binding.setWeatherData(data);
-        } else if (viewType == TODAY_VIEW_TYPE && holder.mBinding instanceof ListItemForecastTodayBinding) {
-            ListItemForecastTodayBinding binding = (ListItemForecastTodayBinding) holder.mBinding;
-            binding.setWeatherData(data);
-        } else {
-            throw new IllegalArgumentException("Invalid view type, value of " + viewType);
-        }
-        holder.mBinding.executePendingBindings();
+        WeatherData weatherData = mData.get(position);
+        holder.bindTo(weatherData);
     }
 
     @Override
@@ -108,6 +96,11 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
             super(binding.getRoot());
             mBinding = binding;
             itemView.setOnClickListener(this);
+        }
+
+        public void bindTo(WeatherData data) {
+            mBinding.setVariable(BR.weatherData, data);
+            mBinding.executePendingBindings();
         }
 
         @Override
