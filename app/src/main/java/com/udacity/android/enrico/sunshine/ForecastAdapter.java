@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.udacity.android.enrico.sunshine.data.WeatherData;
 import com.udacity.android.enrico.sunshine.databinding.ForecastListItemBinding;
+import com.udacity.android.enrico.sunshine.databinding.ListItemForecastTodayBinding;
 
 import java.util.List;
 
@@ -19,8 +20,14 @@ import java.util.List;
 
 public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapterViewHolder> {
 
+    private static final int TODAY_VIEW_TYPE = 0;
+    private static final int FUTURE_DAY_VIEW_TYPE = 1;
+
     private Context mContext;
     private List<WeatherData> mData;
+
+    private boolean mUseTodayLayout;
+
     private ForecastAdapterOnClickHandler mListener;
 
     public interface ForecastAdapterOnClickHandler {
@@ -30,14 +37,36 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
     public ForecastAdapter(Context context, ForecastAdapterOnClickHandler listener) {
         this.mContext = context;
         this.mListener = listener;
+
+        mUseTodayLayout = context.getResources().getBoolean(R.bool.use_today_layout);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (mUseTodayLayout && position == 0) {
+            return TODAY_VIEW_TYPE;
+        } else {
+            return FUTURE_DAY_VIEW_TYPE;
+        }
     }
 
     @Override
     public ForecastAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
-        ViewDataBinding binding = DataBindingUtil.inflate(inflater, R.layout.forecast_list_item, parent, false);
+        int layoutId;
+        switch (viewType) {
+            case TODAY_VIEW_TYPE:
+                layoutId = R.layout.list_item_forecast_today;
+                break;
+            case FUTURE_DAY_VIEW_TYPE:
+                layoutId = R.layout.forecast_list_item;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid view type, value of " + viewType);
+        }
 
+        ViewDataBinding binding = DataBindingUtil.inflate(inflater, layoutId, parent, false);
         return new ForecastAdapterViewHolder(binding);
     }
 
@@ -45,9 +74,16 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
     public void onBindViewHolder(ForecastAdapterViewHolder holder, int position) {
         WeatherData data = mData.get(position);
 
-        if (holder.mBinding instanceof ForecastListItemBinding) {
+        int viewType = getItemViewType(position);
+
+        if (viewType == FUTURE_DAY_VIEW_TYPE && holder.mBinding instanceof ForecastListItemBinding) {
             ForecastListItemBinding binding = (ForecastListItemBinding) holder.mBinding;
             binding.setWeatherData(data);
+        } else if (viewType == TODAY_VIEW_TYPE && holder.mBinding instanceof ListItemForecastTodayBinding) {
+            ListItemForecastTodayBinding binding = (ListItemForecastTodayBinding) holder.mBinding;
+            binding.setWeatherData(data);
+        } else {
+            throw new IllegalArgumentException("Invalid view type, value of " + viewType);
         }
         holder.mBinding.executePendingBindings();
     }
