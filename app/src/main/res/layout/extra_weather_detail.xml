@@ -13,6 +13,7 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/detail_accent_pane_background"
         android:paddingBottom="@dimen/forecast_detail_vertical_padding"
         android:paddingEnd="@dimen/forecast_detail_horizontal_padding"
         android:paddingLeft="@dimen/forecast_detail_horizontal_padding"
@@ -29,9 +30,7 @@
 
         <TextView
             android:id="@+id/humidity_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
+            style="@style/DetailLabel"
             android:text="@string/humidity_label"
             android:contentDescription="@{weatherData.humidityA11y}"
             app:layout_constraintBottom_toTopOf="@+id/pressure_label"
@@ -40,9 +39,7 @@
 
         <TextView
             android:id="@+id/pressure_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
+            style="@style/DetailLabel"
             android:text="@string/pressure_label"
             android:contentDescription="@{weatherData.pressureA11y}"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -51,9 +48,7 @@
 
         <TextView
             android:id="@+id/wind_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
+            style="@style/DetailLabel"
             android:text="@string/wind_label"
             android:contentDescription="@{weatherData.windA11y}"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -62,8 +57,7 @@
 
         <TextView
             android:id="@+id/humidity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ExtraWeatherMeasurement"
             android:text="@{weatherData.humidity}"
             android:contentDescription="@{weatherData.humidityA11y}"
             tools:text="38%"
@@ -72,8 +66,7 @@
 
         <TextView
             android:id="@+id/pressure"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ExtraWeatherMeasurement"
             android:text="@{weatherData.pressure}"
             android:contentDescription="@{weatherData.pressureA11y}"
             tools:text="995 hPa"
@@ -82,8 +75,7 @@
 
         <TextView
             android:id="@+id/wind"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ExtraWeatherMeasurement"
             android:text="@{weatherData.wind}"
             android:contentDescription="@{weatherData.windA11y}"
             tools:text="4km/h NW"
