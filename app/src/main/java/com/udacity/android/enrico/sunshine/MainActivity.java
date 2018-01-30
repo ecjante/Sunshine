@@ -155,8 +155,6 @@ public class MainActivity extends AppCompatActivity implements
                         String selection = WeatherContract.WeatherEntry.getSqlSelectForTodayOnwards();
                         String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
 
-                        Timber.d("**********URI: " + uri);
-
                         Cursor cursor = getContext().getContentResolver().query(
                                 uri,
                                 MAIN_FORECAST_PROJECTION,
@@ -170,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements
                         if (cursor != null) {
                             while (cursor.moveToNext()) {
                                 WeatherData weather = WeatherData.createListData(getContext(), cursor);
-                                Timber.d(weather.getDate());
                                 data.add(weather);
                             }
                             cursor.close();

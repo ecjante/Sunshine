@@ -1,59 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.udacity.android.enrico.sunshine.DetailActivity"
-    android:padding="8dp" >
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/date"
-        style="@style/TextAppearance.AppCompat.Large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="Saturday, September 24"/>
+    <data>
+        <variable
+            name="weatherData"
+            type="com.udacity.android.enrico.sunshine.data.WeatherData" />
+    </data>
 
-    <TextView
-        android:id="@+id/weather_description"
-        style="@style/TextAppearance.AppCompat.Large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="Rainy"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
-    <TextView
-        android:id="@+id/high_temperature"
-        style="@style/TextAppearance.AppCompat.Large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="19\u00b0"/>
+        <include
+            android:id="@+id/primary_info"
+            layout="@layout/primary_weather_info"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            bind:weatherData="@{weatherData}" />
 
-    <TextView
-        android:id="@+id/low_temperature"
-        style="@style/TextAppearance.AppCompat.Large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="10\u00b0"/>
+        <include
+            android:id="@+id/extra_detail"
+            layout="@layout/extra_weather_detail"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            bind:weatherData="@{weatherData}" />
 
-    <TextView
-        android:id="@+id/humidity"
-        style="@style/TextAppearance.AppCompat.Large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="38%"/>
-
-    <TextView
-        android:id="@+id/pressure"
-        style="@style/TextAppearance.AppCompat.Large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="995 hPa"/>
-
-    <TextView
-        android:id="@+id/wind"
-        style="@style/TextAppearance.AppCompat.Large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="4km/h NW"/>
-
-</LinearLayout>
+    </LinearLayout>
+</layout>

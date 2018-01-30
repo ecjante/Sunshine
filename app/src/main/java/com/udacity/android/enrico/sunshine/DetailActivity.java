@@ -1,10 +1,12 @@
 package com.udacity.android.enrico.sunshine;
 
 import android.app.LoaderManager;
+import android.content.AsyncTaskLoader;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ShareCompat;
@@ -14,11 +16,15 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.udacity.android.enrico.sunshine.data.WeatherContract.WeatherEntry;
+import com.udacity.android.enrico.sunshine.data.WeatherData;
+import com.udacity.android.enrico.sunshine.databinding.ActivityDetailBinding;
 import com.udacity.android.enrico.sunshine.utilities.SunshineDateUtils;
 import com.udacity.android.enrico.sunshine.utilities.SunshineWeatherUtils;
 
+import timber.log.Timber;
+
 public class DetailActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<Cursor> {
+        LoaderManager.LoaderCallbacks<WeatherData> {
 
     private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
 
@@ -44,24 +50,16 @@ public class DetailActivity extends AppCompatActivity implements
 
     private static final int LOADER_ID = 44;
 
+    ActivityDetailBinding mBinding;
+
     private String mWeatherDetails;
 
     private Uri mUri;
 
-    private TextView mDate, mDescription, mHigh, mLow, mHumidity, mWind, mPressure;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
-
-        mDate = findViewById(R.id.date);
-        mDescription = findViewById(R.id.weather_description);
-        mHigh = findViewById(R.id.high_temperature);
-        mLow = findViewById(R.id.low_temperature);
-        mHumidity = findViewById(R.id.humidity);
-        mWind = findViewById(R.id.wind);
-        mPressure = findViewById(R.id.pressure);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
         Intent intent = getIntent();
         if (intent != null) {
@@ -75,86 +73,81 @@ public class DetailActivity extends AppCompatActivity implements
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+    public Loader<WeatherData> onCreateLoader(int i, Bundle bundle) {
         switch (i) {
             case LOADER_ID:
 
-                return new CursorLoader(
-                        this,
-                        mUri,
-                        DETAIL_PROJECTION,
-                        null, null, null
-                );
+                return new AsyncTaskLoader<WeatherData>(this) {
+
+                    @Override
+                    protected void onStartLoading() {
+                        super.onStartLoading();
+                        forceLoad();
+                    }
+
+                    @Override
+                    public WeatherData loadInBackground() {
+
+                        Cursor cursor = getContext().getContentResolver().query(
+                                mUri,
+                                DETAIL_PROJECTION,
+                                null, null, null
+                        );
+
+                        if (cursor != null && cursor.moveToFirst()) {
+                            WeatherData data = WeatherData.createDetailData(getContext(), cursor);
+
+                            return data;
+                        }
+
+                        return null;
+                    }
+                };
             default:
                 throw new RuntimeException("Loader Not Implemented: " + i);
         }
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        boolean cursorHasValidData = false;
-        if (data != null && data.moveToFirst()) {
-            cursorHasValidData = true;
-        }
+    public void onLoadFinished(Loader<WeatherData> loader, WeatherData data) {
+        if (data != null) {
+            mBinding.setWeatherData(data);
+            mBinding.executePendingBindings();
 
-        if (cursorHasValidData) {
-            long date = data.getLong(INDEX_WEATHER_DATE);
-            String readableDate = SunshineDateUtils.getFriendlyDateString(this, date, true);
-            mDate.setText(readableDate);
-
-            int weatherId = data.getInt(INDEX_WEATHER_CONDITION_ID);
-            String description = SunshineWeatherUtils.getStringForWeatherCondition(this, weatherId);
-            mDescription.setText(description);
-
-            double minTemp = data.getDouble(INDEX_WEATHER_MIN_TEMP);
-            String lowTemp = SunshineWeatherUtils.formatTemperature(this, minTemp);
-            mLow.setText(lowTemp);
-
-            double maxTemp = data.getDouble(INDEX_WEATHER_MAX_TEMP);
-            String highTemp = SunshineWeatherUtils.formatTemperature(this, maxTemp);
-            mHigh.setText(highTemp);
-
-            float humidity = data.getFloat(INDEX_WEATHER_HUMIDITY);
-            String humidityStr = SunshineWeatherUtils.getFormattedHumidity(this, humidity);
-            mHumidity.setText(humidityStr);
-
-            float pressure = data.getFloat(INDEX_WEATHER_PRESSURE);
-            String pressureStr = SunshineWeatherUtils.getFormattedPressure(this, pressure);
-            mPressure.setText(pressureStr);
-
-            float windSpeed = data.getFloat(INDEX_WEATHER_WIND_SPEED);
-            float windDirection = data.getFloat(INDEX_WEATHER_DEGREES);
-            String windStr = SunshineWeatherUtils.getFormattedWind(this, windSpeed, windDirection);
-            mWind.setText(windStr);
-
-            mWeatherDetails = readableDate + " - " + description + " - " + lowTemp + "/" + highTemp;
+            mWeatherDetails = data.getSummary();
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(Loader<WeatherData> loader) {
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.detail, menu);
-        MenuItem item = menu.findItem(R.id.action_share);
-        item.setIntent(createShareDetailsIntent());
         return true;
     }
 
     private Intent createShareDetailsIntent() {
-        return ShareCompat.IntentBuilder.from(this)
+        Intent intent =  ShareCompat.IntentBuilder.from(this)
                 .setType("text/plain")
-                .setText(mWeatherDetails)
+                .setText(mWeatherDetails + " " + FORECAST_SHARE_HASHTAG)
                 .getIntent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+        return intent;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemSelected = item.getItemId();
         switch (itemSelected) {
+            case R.id.action_share:
+                Intent intent = createShareDetailsIntent();
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+                return true;
             case R.id.action_settings:
                 SettingsActivity.launch(this);
                 return true;
