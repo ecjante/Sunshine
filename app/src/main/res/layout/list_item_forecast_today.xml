@@ -10,87 +10,93 @@
             type="com.udacity.android.enrico.sunshine.data.WeatherData" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:paddingBottom="@dimen/today_forecast_list_item_vertical_padding"
-        android:paddingTop="@dimen/today_forecast_list_item_vertical_padding" >
+        android:background="@color/colorPrimary" >
 
-        <android.support.constraint.Guideline
-            android:id="@+id/horizontal_middle"
-            android:layout_width="wrap_content"
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="192dp" />
+            android:background="?attr/selectableItemBackground"
+            android:paddingBottom="@dimen/today_forecast_list_item_vertical_padding"
+            android:paddingTop="@dimen/today_forecast_list_item_vertical_padding" >
 
-        <TextView
-            android:id="@+id/date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/today_forecast_list_date_vertical_padding"
-            android:fontFamily="sans-serif"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textColor="@color/white"
-            android:textSize="@dimen/today_forecast_list_date_text_size"
-            tools:text="Today, January 29"
-            android:text="@{weatherData.date}"
-            app:layout_constraintBottom_toTopOf="@+id/weather_icon"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+            <android.support.constraint.Guideline
+                android:id="@+id/horizontal_middle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="192dp" />
 
-        <ImageView
-            android:id="@+id/weather_icon"
-            android:layout_width="@dimen/today_icon"
-            android:layout_height="@dimen/today_icon"
-            android:adjustViewBounds="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/horizontal_middle"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/art_clear"
-            android:setWeatherIcon="@{weatherData.largeIcon}" />
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/today_forecast_list_date_vertical_padding"
+                android:fontFamily="sans-serif"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/white"
+                android:textSize="@dimen/today_forecast_list_date_text_size"
+                tools:text="Today, January 29"
+                android:text="@{weatherData.date}"
+                app:layout_constraintBottom_toTopOf="@+id/weather_icon"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent" />
 
-        <TextView
-            android:id="@+id/weather_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/today_forecast_list_description_vertical_padding"
-            android:textColor="@color/white"
-            android:textSize="@dimen/today_forecast_list_description_text_size"
-            android:text="@{weatherData.description}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/weather_icon"
-            app:layout_constraintStart_toStartOf="@+id/weather_icon"
-            app:layout_constraintTop_toBottomOf="@+id/weather_icon"
-            tools:text="Sunny" />
+            <ImageView
+                android:id="@+id/weather_icon"
+                android:layout_width="@dimen/today_icon"
+                android:layout_height="@dimen/today_icon"
+                android:adjustViewBounds="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/horizontal_middle"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/art_clear"
+                android:setWeatherIcon="@{weatherData.largeIcon}" />
 
-        <TextView
-            android:id="@+id/high_temperature"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
-            android:textColor="@color/white"
-            android:textSize="@dimen/today_forecast_list_high_temp_text_size"
-            tools:text="21\u00b0"
-            android:text="@{weatherData.highTemperature}"
-            app:layout_constraintBottom_toBottomOf="@+id/weather_icon"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/horizontal_middle"
-            app:layout_constraintTop_toTopOf="@+id/weather_icon" />
+            <TextView
+                android:id="@+id/weather_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/today_forecast_list_description_vertical_padding"
+                android:textColor="@color/white"
+                android:textSize="@dimen/today_forecast_list_description_text_size"
+                android:text="@{weatherData.description}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/weather_icon"
+                app:layout_constraintStart_toStartOf="@+id/weather_icon"
+                app:layout_constraintTop_toBottomOf="@+id/weather_icon"
+                tools:text="Sunny" />
 
-        <TextView
-            android:id="@+id/low_temperature"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
-            android:textColor="@color/white"
-            android:textSize="@dimen/today_forecast_list_low_temp_text_size"
-            tools:text="19\u00b0"
-            android:text="@{weatherData.lowTemperature}"
-            app:layout_constraintBaseline_toBaselineOf="@+id/weather_description"
-            app:layout_constraintEnd_toEndOf="@+id/high_temperature"
-            app:layout_constraintStart_toStartOf="@+id/high_temperature" />
+            <TextView
+                android:id="@+id/high_temperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:textColor="@color/white"
+                android:textSize="@dimen/today_forecast_list_high_temp_text_size"
+                tools:text="21\u00b0"
+                android:text="@{weatherData.highTemperature}"
+                app:layout_constraintBottom_toBottomOf="@+id/weather_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/horizontal_middle"
+                app:layout_constraintTop_toTopOf="@+id/weather_icon" />
 
-    </android.support.constraint.ConstraintLayout>
+            <TextView
+                android:id="@+id/low_temperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:textColor="@color/white"
+                android:textSize="@dimen/today_forecast_list_low_temp_text_size"
+                tools:text="19\u00b0"
+                android:text="@{weatherData.lowTemperature}"
+                app:layout_constraintBaseline_toBaselineOf="@+id/weather_description"
+                app:layout_constraintEnd_toEndOf="@+id/high_temperature"
+                app:layout_constraintStart_toStartOf="@+id/high_temperature" />
+
+        </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
 </layout>

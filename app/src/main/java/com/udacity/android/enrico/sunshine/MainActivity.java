@@ -71,6 +71,23 @@ public class MainActivity extends AppCompatActivity implements
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
         mRecyclerView = findViewById(R.id.rv_forecast);
 
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (recyclerView.canScrollVertically(-1)) {
+                    getSupportActionBar().setElevation(4f);
+                } else {
+                    getSupportActionBar().setElevation(0f);
+                }
+            }
+        });
+
         mAdapter = new ForecastAdapter(this, this);
         mRecyclerView.setAdapter(mAdapter);
         LinearLayoutManager linearLayout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
