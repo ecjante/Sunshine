@@ -6,8 +6,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
+import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,17 +24,20 @@ import com.udacity.android.enrico.sunshine.sync.SunshineSyncUtils;
 import com.udacity.android.enrico.sunshine.utilities.ReleaseTree;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements
         ForecastAdapter.ForecastAdapterOnClickHandler,
-        LoaderManager.LoaderCallbacks<Cursor> {
+        LoaderManager.LoaderCallbacks<List<WeatherData>> {
 
     private static final int LOADER_ID = 22;
 
     private ProgressBar mLoadingIndicator;
     private RecyclerView mRecyclerView;
+
+    public static boolean sSyncData = false;
 
     private int mPosition = RecyclerView.NO_POSITION;
 
@@ -118,66 +122,77 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<List<WeatherData>> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case LOADER_ID:
-                Uri uri = WeatherContract.WeatherEntry.CONTENT_URI;
-                String selection = WeatherContract.WeatherEntry.getSqlSelectForTodayOnwards();
-                String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
-                return new CursorLoader(
-                        MainActivity.this,
-                        uri,
-                        MAIN_FORECAST_PROJECTION,
-                        selection,
-                        null,
-                        sortOrder
-                );
+                return new AsyncTaskLoader<List<WeatherData>>(this) {
 
-//                return new AsyncTaskLoader<Cursor>(this) {
-//                    @Nullable
-//                    @Override
-//                    public Cursor loadInBackground() {
-//                        Uri uri = WeatherContract.WeatherEntry.CONTENT_URI;
-//                        String selection = WeatherContract.WeatherEntry.getSqlSelectForTodayOnwards();
-//                        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
-//                        Cursor cursor = MainActivity.this.getContentResolver().query(
-//                                uri,
-//                                MAIN_FORECAST_PROJECTION,
-//                                selection,
-//                                null,
-//                                sortOrder
-//                        );
-//
-//                        ArrayList<WeatherData> data = new ArrayList<>();
-//
-//                        if (cursor != null) {
-//                            while (cursor.moveToNext()) {
-//                                WeatherData weather = WeatherData.createListData(MainActivity.this, cursor);
-//                                Timber.d(weather.getDate());
-//                                data.add(weather);
-//                            }
-//                            cursor.close();
-//                            return data;
-//                        } else {
-//                            return null;
-//                        }
-//                    }
-//                };
+                    List<WeatherData> mWeatherData;
+
+                    @Override
+                    protected void onStartLoading() {
+                        super.onStartLoading();
+
+                        showLoading();
+                        if (sSyncData) {
+                            sSyncData = false;
+                            forceLoad();
+                            return;
+                        }
+
+                        if (mWeatherData != null) {
+                            showWeatherData();
+                            deliverResult(mWeatherData);
+                        } else {
+                            forceLoad();
+                        }
+                    }
+
+                    @Nullable
+                    @Override
+                    public List<WeatherData> loadInBackground() {
+                        Uri uri = WeatherContract.WeatherEntry.CONTENT_URI;
+                        String selection = WeatherContract.WeatherEntry.getSqlSelectForTodayOnwards();
+                        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
+
+                        Timber.d("**********URI: " + uri);
+
+                        Cursor cursor = getContext().getContentResolver().query(
+                                uri,
+                                MAIN_FORECAST_PROJECTION,
+                                selection,
+                                null,
+                                sortOrder
+                        );
+
+                        ArrayList<WeatherData> data = new ArrayList<>();
+
+                        if (cursor != null) {
+                            while (cursor.moveToNext()) {
+                                WeatherData weather = WeatherData.createListData(getContext(), cursor);
+                                Timber.d(weather.getDate());
+                                data.add(weather);
+                            }
+                            cursor.close();
+                            return data;
+                        } else {
+                            return null;
+                        }
+                    }
+
+                    @Override
+                    public void deliverResult(@Nullable List<WeatherData> data) {
+                        mWeatherData = data;
+                        super.deliverResult(mWeatherData);
+                    }
+                };
             default:
                 throw new RuntimeException("Loader Not Implemented: " + id);
         }
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        ArrayList<WeatherData> data = new ArrayList<>();
-
-        while (cursor.moveToNext()) {
-            WeatherData weather = WeatherData.createListData(MainActivity.this, cursor);
-            Timber.d(weather.getDate());
-            data.add(weather);
-        }
-
+    public void onLoadFinished(Loader<List<WeatherData>> loader, List<WeatherData> data) {
         mAdapter.swapData(data);
         if (mPosition == RecyclerView.NO_POSITION)
             mPosition = 0;
@@ -188,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(Loader<List<WeatherData>> loader) {
         mAdapter.swapData(null);
     }
 
@@ -215,10 +230,5 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 }

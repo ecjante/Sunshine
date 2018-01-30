@@ -63,8 +63,7 @@ public class SunshineSyncTask {
                     oneDayPassedSinceLastNotification = true;
                 }
 
-
-                if (notificationsEnabled /*&& oneDayPassedSinceLastNotification*/) {
+                if (notificationsEnabled && oneDayPassedSinceLastNotification) {
                     NotificationUtils.notifyUserOfNewWeather(context);
                 }
             }

@@ -13,6 +13,7 @@ import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.firebase.jobdispatcher.Job;
 import com.firebase.jobdispatcher.Lifetime;
 import com.firebase.jobdispatcher.Trigger;
+import com.udacity.android.enrico.sunshine.MainActivity;
 import com.udacity.android.enrico.sunshine.data.WeatherContract;
 
 import java.util.concurrent.TimeUnit;
@@ -90,6 +91,7 @@ public class SunshineSyncUtils {
     }
 
     public static void startImmediateSync(@NonNull final Context context) {
+        MainActivity.sSyncData = true;
         Intent intent = new Intent(context, SunshineSyncIntentService.class);
         context.startService(intent);
     }
