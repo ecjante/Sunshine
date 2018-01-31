@@ -51,7 +51,8 @@ public class SunshineWidgetProvider extends AppWidgetProvider {
         views.setTextViewText(R.id.high_temperature, mWeatherData.getHighTemperature());
 
         // Widgets allow click handlers to only launch pending intents
-        views.setOnClickPendingIntent(R.id.weather_icon, pendingIntent);
+
+        views.setOnClickPendingIntent(R.id.sunshine_widget, pendingIntent);
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
