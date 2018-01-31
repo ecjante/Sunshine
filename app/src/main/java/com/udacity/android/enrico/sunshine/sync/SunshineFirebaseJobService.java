@@ -1,9 +1,11 @@
 package com.udacity.android.enrico.sunshine.sync;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
+import com.udacity.android.enrico.sunshine.widget.SunshineWidgetService;
 
 import timber.log.Timber;
 
@@ -21,7 +23,9 @@ public class SunshineFirebaseJobService extends JobService {
 
             @Override
             protected Void doInBackground(Void... voids) {
-                SunshineSyncTask.syncWeather(getApplicationContext());
+                Context context = getApplicationContext();
+                SunshineSyncTask.syncWeather(context);
+                SunshineWidgetService.startActionUpdateSunshinWidgets(context);
                 return null;
             }
 
