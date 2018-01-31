@@ -4,13 +4,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg" >
 
     <ImageView
         android:id="@+id/weather_icon"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
         android:layout_gravity="center"
+        android:layout_weight="2"
+        android:adjustViewBounds="true"
         android:src="@drawable/art_clear" />
-    
+
+    <TextView
+        android:id="@+id/high_temperature"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:fontFamily="sans-serif-light"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        tools:text="21\u00b0" />
+
 </LinearLayout>

@@ -7,8 +7,6 @@ import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 import com.udacity.android.enrico.sunshine.widget.SunshineWidgetService;
 
-import timber.log.Timber;
-
 /**
  * Created by enrico on 1/29/18.
  */
@@ -25,7 +23,7 @@ public class SunshineFirebaseJobService extends JobService {
             protected Void doInBackground(Void... voids) {
                 Context context = getApplicationContext();
                 SunshineSyncTask.syncWeather(context);
-                SunshineWidgetService.startActionUpdateSunshinWidgets(context);
+                SunshineWidgetService.startActionUpdateSunshineWidgets(context);
                 return null;
             }
 

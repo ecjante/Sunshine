@@ -24,7 +24,7 @@ public class SunshineWidgetService extends IntentService {
         super(SunshineWidgetService.class.getSimpleName());
     }
 
-    public static void startActionUpdateSunshinWidgets(Context context) {
+    public static void startActionUpdateSunshineWidgets(Context context) {
         Intent intent = new Intent(context, SunshineWidgetService.class);
         intent.setAction(ACTION_UPDATE);
         context.startService(intent);
