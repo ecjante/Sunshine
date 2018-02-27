@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.udacity.android.enrico.sunshine.MainActivity;
 import com.udacity.android.enrico.sunshine.R;
 import com.udacity.android.enrico.sunshine.utilities.NotificationUtils;
 
@@ -32,6 +33,27 @@ public class SunshinePreferences {
      */
     public static final String PREF_COORD_LAT = "coord_lat";
     public static final String PREF_COORD_LONG = "coord_long";
+
+    public static void setNotificationsEnabled(Context context, boolean isEnabled) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean(context.getString(R.string.pref_enable_notifications_key), isEnabled)
+                .apply();
+    }
+
+    public static void setLocationEnabled(Context context, boolean isEnable) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean(context.getString(R.string.pref_enable_location_key), isEnable)
+                .apply();
+    }
+
+    public static void setLocation(Context context, String location) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putString(context.getString(R.string.pref_location_key), location)
+                .apply();
+    }
 
     /**
      * Helper method to handle setting location details in Preferences (city name, latitude,
@@ -187,7 +209,7 @@ public class SunshinePreferences {
      * @param context Used to access SharedPreferences as well as use other utility methods
      * @return Elapsed time in milliseconds since the last notification was shown
      */
-    public static long getEllapsedTimeSinceLastNotification(Context context) {
+    public static long getElapsedTimeSinceLastNotification(Context context) {
         long lastNotificationTimeMillis =
                 SunshinePreferences.getLastNotificationTimeInMillis(context);
         long timeSinceLastNotification = System.currentTimeMillis() - lastNotificationTimeMillis;

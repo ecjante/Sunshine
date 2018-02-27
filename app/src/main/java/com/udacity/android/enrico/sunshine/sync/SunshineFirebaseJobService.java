@@ -23,7 +23,6 @@ public class SunshineFirebaseJobService extends JobService {
             protected Void doInBackground(Void... voids) {
                 Context context = getApplicationContext();
                 SunshineSyncTask.syncWeather(context);
-                SunshineWidgetService.startActionUpdateSunshineWidgets(context);
                 return null;
             }
 

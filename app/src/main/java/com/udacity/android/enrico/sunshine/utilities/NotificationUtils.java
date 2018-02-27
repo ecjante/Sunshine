@@ -1,5 +1,6 @@
 package com.udacity.android.enrico.sunshine.utilities;
 
+import android.annotation.TargetApi;
 import android.app.IntentService;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -179,10 +180,29 @@ public class NotificationUtils {
             NotificationManager notificationManager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationChannel notificationChannel = notificationManager.getNotificationChannel(NOTIFICATION_CHANNEL_ID);
+            if (notificationChannel == null) {
+                notificationChannel = createNotificationChannel(context);
+            }
             return notificationChannel.getImportance() != NotificationManager.IMPORTANCE_NONE;
         } else {
             return NotificationManagerCompat.from(context).areNotificationsEnabled();
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    public static NotificationChannel createNotificationChannel(Context context) {
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationChannel notificationChannel = new NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                "Notifications",
+                NotificationManager.IMPORTANCE_DEFAULT
+        );
+        notificationChannel.setDescription("Today's Weather");
+        notificationChannel.setVibrationPattern(new long[]{0, 1000});
+        notificationChannel.enableVibration(true);
+        notificationManager.createNotificationChannel(notificationChannel);
+        return notificationChannel;
     }
 
     public static void enableNotificationChannel(Context context, boolean enable) {

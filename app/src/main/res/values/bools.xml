@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <bool name="location_permission">false</bool>
     <bool name="show_notifications">true</bool>
     <bool name="use_today_layout">false</bool>
 </resources>

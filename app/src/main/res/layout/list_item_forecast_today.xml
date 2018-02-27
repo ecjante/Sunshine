@@ -55,6 +55,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:src="@drawable/art_clear"
                 android:setWeatherIcon="@{weatherData.largeIcon}"
+                android:contentDescription="@{weatherData.descriptionA11y}"
                 android:transitionName="@string/weather_icon" />
 
             <TextView
@@ -65,6 +66,7 @@
                 android:textColor="@color/white"
                 android:textSize="@dimen/today_forecast_list_description_text_size"
                 android:text="@{weatherData.description}"
+                android:contentDescription="@{weatherData.descriptionA11y}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/weather_icon"
                 app:layout_constraintStart_toStartOf="@+id/weather_icon"
@@ -80,6 +82,7 @@
                 android:textSize="@dimen/today_forecast_list_high_temp_text_size"
                 tools:text="21\u00b0"
                 android:text="@{weatherData.highTemperature}"
+                android:contentDescription="@{weatherData.highTempA11y}"
                 app:layout_constraintBottom_toBottomOf="@+id/weather_icon"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/horizontal_middle"
@@ -94,6 +97,7 @@
                 android:textSize="@dimen/today_forecast_list_low_temp_text_size"
                 tools:text="19\u00b0"
                 android:text="@{weatherData.lowTemperature}"
+                android:contentDescription="@{weatherData.lowTempA11y}"
                 app:layout_constraintBaseline_toBaselineOf="@+id/weather_description"
                 app:layout_constraintEnd_toEndOf="@+id/high_temperature"
                 app:layout_constraintStart_toStartOf="@+id/high_temperature" />

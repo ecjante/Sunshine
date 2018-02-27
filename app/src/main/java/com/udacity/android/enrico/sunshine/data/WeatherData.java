@@ -41,15 +41,18 @@ public class WeatherData {
 
         int weatherId = cursor.getInt(MainActivity.INDEX_WEATHER_CONDITION_ID);
         weatherData.description = SunshineWeatherUtils.getStringForWeatherCondition(context, weatherId);
+        weatherData.descriptionA11y = context.getString(R.string.a11y_forecast, weatherData.description);
 
         weatherData.icon = SunshineWeatherUtils.getSmallArtResourceIdForWeatherCondition(weatherId);
         weatherData.largeIcon = SunshineWeatherUtils.getLargeArtResourceIdForWeatherCondition(weatherId);
 
         double minTemp = cursor.getDouble(MainActivity.INDEX_WEATHER_MIN_TEMP);
         weatherData.lowTemperature = SunshineWeatherUtils.formatTemperature(context, minTemp);
+        weatherData.lowTempA11y = context.getString(R.string.a11y_low_temp, weatherData.lowTemperature);
 
         double maxTemp = cursor.getDouble(MainActivity.INDEX_WEATHER_MAX_TEMP);
         weatherData.highTemperature = SunshineWeatherUtils.formatTemperature(context, maxTemp);
+        weatherData.highTempA11y = context.getString(R.string.a11y_high_temp, weatherData.highTemperature);
 
         return weatherData;
     }

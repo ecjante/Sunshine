@@ -1,19 +1,11 @@
 package com.udacity.android.enrico.sunshine.sync;
 
-import android.app.NotificationManager;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.text.format.DateUtils;
 
-import com.udacity.android.enrico.sunshine.MainActivity;
-import com.udacity.android.enrico.sunshine.R;
 import com.udacity.android.enrico.sunshine.data.SunshinePreferences;
 import com.udacity.android.enrico.sunshine.data.WeatherContract;
 import com.udacity.android.enrico.sunshine.utilities.NetworkUtils;
@@ -21,8 +13,6 @@ import com.udacity.android.enrico.sunshine.utilities.NotificationUtils;
 import com.udacity.android.enrico.sunshine.utilities.OpenWeatherJsonUtils;
 
 import java.net.URL;
-
-import static com.udacity.android.enrico.sunshine.MainActivity.MAIN_FORECAST_PROJECTION;
 
 /**
  * Created by enrico on 1/29/18.
@@ -51,11 +41,20 @@ public class SunshineSyncTask {
                 // Bulk insert new data
                 resolver.bulkInsert(uri, values);
 
+                // If time since last notification wasn't set, set it and return
+                // this usually means the app was just installed
+                long lastNotificationTimeMillis =
+                        SunshinePreferences.getLastNotificationTimeInMillis(context);
+
+                if (lastNotificationTimeMillis == 0) {
+                    SunshinePreferences.saveLastNotificationTime(context, System.currentTimeMillis());
+                    return;
+                }
+
                 boolean notificationsEnabled = SunshinePreferences.areNotificationsEnabled(context);
 
-
                 long timeSinceLastNotification = SunshinePreferences
-                        .getEllapsedTimeSinceLastNotification(context);
+                        .getElapsedTimeSinceLastNotification(context);
 
                 boolean oneDayPassedSinceLastNotification = false;
 

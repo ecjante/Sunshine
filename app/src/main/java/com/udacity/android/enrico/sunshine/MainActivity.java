@@ -1,13 +1,20 @@
 package com.udacity.android.enrico.sunshine;
 
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -21,19 +28,32 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.udacity.android.enrico.sunshine.data.SunshinePreferences;
 import com.udacity.android.enrico.sunshine.data.WeatherContract;
 import com.udacity.android.enrico.sunshine.data.WeatherData;
 import com.udacity.android.enrico.sunshine.sync.SunshineSyncUtils;
+import com.udacity.android.enrico.sunshine.utilities.LocationUtils;
 import com.udacity.android.enrico.sunshine.utilities.ReleaseTree;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
         ForecastAdapter.ForecastAdapterOnClickHandler,
         LoaderManager.LoaderCallbacks<List<WeatherData>> {
+
+    public static final int PERMISSIONS_REQUEST_FINE_LOCATION = 111;
 
     private static final int LOADER_ID = 22;
 
@@ -45,6 +65,10 @@ public class MainActivity extends AppCompatActivity implements
     private int mPosition = RecyclerView.NO_POSITION;
 
     private ForecastAdapter mAdapter;
+
+    private GoogleApiClient mClient;
+    private FusedLocationProviderClient mFusedLocationClient;
+
 
     public static final String[] MAIN_FORECAST_PROJECTION = {
             WeatherContract.WeatherEntry.COLUMN_DATE,
@@ -97,11 +121,20 @@ public class MainActivity extends AppCompatActivity implements
         mRecyclerView.setLayoutManager(linearLayout);
         mRecyclerView.setHasFixedSize(true);
 
+        mClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .enableAutoManage(this, this)
+                .build();
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
         showLoading();
 
-        getSupportLoaderManager().initLoader(LOADER_ID, null, this);
-
         SunshineSyncUtils.initialize(this);
+
+        getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
     public void openLocationInMap() {
@@ -121,6 +154,44 @@ public class MainActivity extends AppCompatActivity implements
             Timber.d("Couldn't call " + geoLocation.toString()
                     + ", no receiving apps installed!");
         }
+    }
+
+    private void setLocation() {
+        if (LocationUtils.hasLocationPermission(this)) {
+            if (LocationUtils.locationIsEnabled(this)) {
+                updateLocation();
+            } else {
+                enableLocationDialog();
+            }
+        } else {
+            LocationUtils.requestLocationPermission(this, null);
+        }
+    }
+
+    private void enableLocationDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(this).create();
+        dialog.setTitle("");
+        dialog.setMessage("Location for Sunshine is disabled. Would you like to enable location?");
+        dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Enable", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                SunshinePreferences.setLocationEnabled(MainActivity.this, true);
+                updateLocation();
+
+                dialogInterface.dismiss();
+            }
+        });
+        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void updateLocation() {
+        LocationUtils.getLocationUpdate(mFusedLocationClient, this);
     }
 
     private void showWeatherData() {
@@ -226,11 +297,28 @@ public class MainActivity extends AppCompatActivity implements
         mRecyclerView.smoothScrollToPosition(mPosition);
         if (data.size() != 0)
             showWeatherData();
+        else
+            getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
     @Override
     public void onLoaderReset(Loader<List<WeatherData>> loader) {
         mAdapter.swapData(null);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_FINE_LOCATION:
+                SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    SunshinePreferences.setLocationEnabled(this, true);
+                } else {
+                    SunshinePreferences.setLocationEnabled(this, false);
+                }
+        }
     }
 
     @Override
@@ -250,11 +338,29 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.action_map:
                 openLocationInMap();
                 return true;
+            case R.id.action_location:
+                setLocation();
+                return true;
             case R.id.action_settings:
                 SettingsActivity.launch(this);
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Timber.i("API Client Connection Successful!");
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Timber.i("API Client Connection Suspended!");
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Timber.e("API Client Connection Failed!");
     }
 }
